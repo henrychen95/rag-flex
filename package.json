@@ -1,0 +1,40 @@
+{
+  "name": "@yongwei/rag-flex",
+  "version": "1.0.0",
+  "description": "A flexible RAG plugin for LM Studio with dynamic embedding model selection and intelligent context management",
+  "main": "index.js",
+  "scripts": {
+    "dev": "lms dev",
+    "push": "lms push"
+  },
+  "keywords": [
+    "lmstudio",
+    "rag",
+    "retrieval",
+    "embedding",
+    "bge-m3",
+    "nomic",
+    "llm",
+    "ai"
+  ],
+  "author": {
+    "name": "Henry Chen",
+    "url": "https://github.com/henrychen95"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/henrychen95/rag-flex.git"
+  },
+  "homepage": "https://github.com/henrychen95/rag-flex#readme",
+  "bugs": {
+    "url": "https://github.com/henrychen95/rag-flex/issues"
+  },
+  "dependencies": {
+    "@lmstudio/sdk": "1.4.0",
+    "zod": "3.24.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.8"
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "type": "plugin",
+  "runner": "node",
+  "owner": "yongwei",
+  "name": "rag-flex",
+  "revision": 1
+}
