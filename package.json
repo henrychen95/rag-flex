@@ -1,6 +1,6 @@
 {
   "name": "@yongwei/rag-flex",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A flexible RAG plugin for LM Studio with dynamic embedding model selection and intelligent context management",
   "main": "index.js",
   "scripts": {

@@ -66,9 +66,10 @@ The plugin will automatically load into LM Studio. You should see "Register with
 | Model | Size | Speed | Best For | Notes |
 |-------|------|-------|----------|-------|
 | **nomic-ai/nomic-embed-text-v1.5-GGUF** | 84 MB | ⚡ Fast | English, general use | LM Studio built-in, Q4_K_M |
+| **NathanMad/sentence-transformers_all-MiniLM-L12-v2-gguf** | 133 MB | ⚡ Fast | Lightweight tasks | F32, small and efficient |
+| **groonga/gte-large-Q4_K_M-GGUF** | 216 MB | ⚙️ Medium | Balanced performance | Q4_K_M, good quality/speed ratio |
 | **lm-kit/bge-m3-gguf** | 1.16 GB | 🐌 Slow | Chinese, multilingual | F16 high precision |
-| **sentence-transformers/all-MiniLM-L6-v2-f16.gguf** | ~90 MB | ⚡ Fast | Lightweight tasks | Small and efficient |
-| **thenlper/gte-large-Q4_K_M.gguf** | ~600 MB | ⚙️ Medium | Balanced performance | Good quality/speed ratio |
+
 
 ## 💡 Use Cases
 

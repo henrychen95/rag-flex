@@ -18,9 +18,9 @@ export async function main(context: PluginContext) {
     // 1. 定義保底顯示的模型清單
     const defaultModels = [
         "nomic-ai/nomic-embed-text-v1.5-GGUF",
-        "lm-kit/bge-m3-gguf",
-        "sentence-transformers/all-MiniLM-L6-v2-f16.gguf",
-        "thenlper/gte-large-Q4_K_M.gguf"
+        "NathanMad/sentence-transformers_all-MiniLM-L12-v2-gguf",
+        "groonga/gte-large-Q4_K_M-GGUF",
+        "lm-kit/bge-m3-gguf"
     ];
 
     let embeddingChoices: string[] = [...defaultModels];

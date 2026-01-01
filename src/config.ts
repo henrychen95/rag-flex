@@ -4,9 +4,9 @@ export const createDynamicConfig = (modelChoices: string[]) => {
     const safeChoices = (Array.isArray(modelChoices) && modelChoices.length > 0)
         ? modelChoices
         : ["nomic-ai/nomic-embed-text-v1.5-GGUF",
-            "lm-kit/bge-m3-gguf",
-            "sentence-transformers/all-MiniLM-L6-v2-f16.gguf",
-            "thenlper/gte-large-Q4_K_M.gguf"];
+            "NathanMad/sentence-transformers_all-MiniLM-L12-v2-gguf",
+            "groonga/gte-large-Q4_K_M-GGUF",
+            "lm-kit/bge-m3-gguf"];
 
     return createConfigSchematics()
         .field(
@@ -50,7 +50,7 @@ export const createDynamicConfig = (modelChoices: string[]) => {
                 min: 0.0,
                 max: 1.0,
                 displayName: "Retrieval Affinity Threshold",
-                subtitle: "相關性門檻 ｜ ◆ BGE-M3 建議 0.4-0.6 ｜ ◆ 程式碼/SQL 檔案建議設低一點 (如 0.4) 以免找不到內容。",
+                subtitle: "相關性門檻 ｜ BGE-M3 建議 0.4-0.6 ｜ 程式碼/SQL 檔案建議設低一點 (如 0.4) 以免找不到內容。",
                 slider: {min: 0.0, max: 1.0, step: 0.01},
             },
             0.4,
