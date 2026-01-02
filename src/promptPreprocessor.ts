@@ -1,10 +1,25 @@
 import {type Chat, type ChatMessage, type FileHandle, type LLMDynamicHandle, type PredictionProcessStatusController, type PromptPreprocessorController, text,} from "@lmstudio/sdk";
 import {dynamicConfig} from "./index";
-import {CONFIG_KEYS} from "./config";
+import {CONFIG_KEYS, parseLanguageFromDisplay} from "./config";
+import {setLanguage, t} from "./i18n";
+import fs from "fs";
 
 type DocumentContextInjectionStrategy = "none" | "inject-full-content" | "retrieval";
 
+
+// Debug 函數
+const debug = (msg: string, data?: any) => {
+    const log = `[${new Date().toISOString()}] ${msg}${data ? ' ' + JSON.stringify(data, null, 2) : ''}\n`;
+    fs.appendFileSync('D:\\dev\\rag-flex\\logs\\lmstudio-debug.log', log);  // Windows 路徑
+};
+
 export async function preprocess(ctl: PromptPreprocessorController, userMessage: ChatMessage) {
+    // Read user's language preference from config and set it
+    const pluginConfig = ctl.getPluginConfig(dynamicConfig);
+    const languageDisplayValue = pluginConfig.get(CONFIG_KEYS.LANGUAGE) as string;
+    const userLanguage = parseLanguageFromDisplay(languageDisplayValue);
+    setLanguage(userLanguage);
+
     const userPrompt = userMessage.getText();
     const history = await ctl.pullHistory();
     history.append(userMessage);
@@ -30,6 +45,7 @@ async function prepareRetrievalResultsContextInjection(
     originalUserPrompt: string,
     files: Array<FileHandle>,
 ): Promise<string> {
+    const translations = t();
     const pluginConfig = ctl.getPluginConfig(dynamicConfig);
     const retrievalLimit = pluginConfig.get(CONFIG_KEYS.LIMIT);
     const retrievalAffinityThreshold = pluginConfig.get(CONFIG_KEYS.THRESHOLD);
@@ -42,7 +58,7 @@ async function prepareRetrievalResultsContextInjection(
 
     const retrievingStatus = ctl.createStatus({
         status: "loading",
-        text: `載入 Embedding 模型: ${modelPath}...`,
+        text: translations.status.loadingEmbeddingModel(modelPath),
     });
 
     try {
@@ -53,9 +69,11 @@ async function prepareRetrievalResultsContextInjection(
 
         retrievingStatus.setState({
             status: "loading",
-            text: `正在為您的問題檢索相關片段...`,
+            text: translations.status.retrievingCitations,
         });
 
+        debug('model path:', model.path);
+        debug('model identifer:', model.identifier);
         const result = await ctl.client.files.retrieve(originalUserPrompt, files, {
             embeddingModel: model,
             // Affinity threshold: 0.6 not implemented
@@ -67,7 +85,7 @@ async function prepareRetrievalResultsContextInjection(
                         file,
                         retrievingStatus.addSubStatus({
                             status: "waiting",
-                            text: `Process ${file.name} for retrieval`,
+                            text: translations.status.processFileForRetrieval(file.name),
                         }),
                     );
                 }
@@ -75,18 +93,20 @@ async function prepareRetrievalResultsContextInjection(
             onFileProcessingStart(file) {
                 statusSteps
                     .get(file)!
-                    .setState({status: "loading", text: `Processing ${file.name} for retrieval`});
+                    .setState({status: "loading", text: translations.status.processingFileForRetrieval(file.name)});
             },
             onFileProcessingEnd(file) {
                 statusSteps
                     .get(file)!
-                    .setState({status: "done", text: `Processed ${file.name} for retrieval`});
+                    .setState({status: "done", text: translations.status.processedFileForRetrieval(file.name)});
             },
             onFileProcessingStepProgress(file, step, progressInStep) {
-                const verb = step === "loading" ? "Loading" : step === "chunking" ? "Chunking" : "Embedding";
+                const verb = step === "loading" ? translations.verbs.loading :
+                            step === "chunking" ? translations.verbs.chunking :
+                            translations.verbs.embedding;
                 statusSteps.get(file)!.setState({
                     status: "loading",
-                    text: `${verb} ${file.name} for retrieval (${(progressInStep * 100).toFixed(1)}%)`,
+                    text: translations.status.fileProcessProgress(verb, file.name, `${(progressInStep * 100).toFixed(1)}%`),
                 });
             },
         });
@@ -95,7 +115,7 @@ async function prepareRetrievalResultsContextInjection(
         result.entries = result.entries.filter(entry => entry.score > retrievalAffinityThreshold);
 
         if (!result) {
-            return `系統錯誤：無法取得檢索結果`;
+            return translations.errors.retrievalFailed;
         }
 
         // inject a retrieval result into the "processed" content
@@ -106,38 +126,24 @@ async function prepareRetrievalResultsContextInjection(
             // show status
             retrievingStatus.setState({
                 status: "done",
-                text: `成功檢索到 ${numRetrievals} 個相關片段 (門檻: ${retrievalAffinityThreshold})`,
+                text: translations.status.retrievalSuccess(numRetrievals, retrievalAffinityThreshold),
             });
             ctl.debug("Retrieval results", result);
             // add results to prompt
-            const prefix = "以下是從使用者文件中找到的相關參考內容：\n\n";
-            processedContent += prefix;
-            let citationNumber = 1;
+            processedContent += translations.llmPrompts.citationsPrefix;
             result.entries.forEach((entry, index) => {
-                processedContent += `參考片段 ${index + 1}】:\n"${entry.content}"\n\n`;
-                citationNumber++;
+                processedContent += `${translations.llmPrompts.citationLabel(index + 1)}: "${entry.content}"\n\n`;
             });
             await ctl.addCitations(result);
-            const suffix =
-                `Use the citations above to respond to the user query, only if they are relevant. ` +
-                `Otherwise, respond to the best of your ability without them.` +
-                `\n\nUser Query:\n\n${originalUserPrompt}`;
-            processedContent += suffix;
+            processedContent += translations.llmPrompts.citationsSuffix(originalUserPrompt);
         } else {
             // retrieval occured but no relevant citations found
             retrievingStatus.setState({
                 status: "canceled",
-                text: `找不到任何相關內容 (門檻: ${retrievalAffinityThreshold})`,
+                text: translations.status.noRelevantContent(retrievalAffinityThreshold),
             });
             ctl.debug("No relevant citations found for user query");
-            const noteAboutNoRetrievalResultsFound =
-                `Important: No citations were found in the user files for the user query. ` +
-                `In less than one sentence, inform the user of this. ` +
-                `Then respond to the query to the best of your ability.`;
-            processedContent =
-                // noteAboutNoRetrievalResultsFound + `\n\nUser Query:\n\n${originalUserPrompt}`;
-                // 改良：不要叫 LLM 承認自己沒看到檔案，這會讓它變笨
-                processedContent = `[系統提示: 檢索未發現高相關性片段，請根據文件脈絡盡力回答]\n\n使用者問題：\n\n${originalUserPrompt}`;
+            processedContent = translations.llmPrompts.noRetrievalNote(originalUserPrompt);
         }
         ctl.debug("Processed content", processedContent);
 
@@ -152,17 +158,10 @@ async function prepareRetrievalResultsContextInjection(
         // 模型載入失敗
         retrievingStatus.setState({
             status: "error",
-            text: `❌ 找不到 Embedding 模型: ${modelPath}`,
+            text: translations.errors.modelNotFound(modelPath),
         });
 
-        return `⚠️ **Embedding 模型未找到**\n\n` +
-            `無法載入模型: \`${modelPath}\`\n\n` +
-            `請先到 LM Studio 下載此模型:\n` +
-            `1. 點擊左側 "🔍 Search" 搜尋模型\n` +
-            `2. 搜尋並下載: ${modelPath}\n` +
-            `3. 下載完成後重新執行\n\n` +
-            `或者在插件設定中選擇其他已下載的 Embedding 模型。\n\n` +
-            `原始錯誤: ${error}`;
+        return translations.errors.modelNotFoundDetail(modelPath, error);
     }
 }
 
@@ -170,6 +169,7 @@ async function prepareDocumentContextInjection(
     ctl: PromptPreprocessorController,
     input: ChatMessage,
 ): Promise<ChatMessage> {
+    const translations = t();
     const documentInjectionSnippets: Map<FileHandle, string> = new Map();
     const files = input.consumeFiles(ctl.client, file => file.type !== "image");
     for (const file of files) {
@@ -192,14 +192,13 @@ async function prepareDocumentContextInjection(
     let formattedFinalUserPrompt = "";
 
     if (documentInjectionSnippets.size > 0) {
-        formattedFinalUserPrompt +=
-            "This is a Enriched Context Generation scenario.\n\nThe following content was found in the files provided by the user.\n";
+        formattedFinalUserPrompt += translations.llmPrompts.enrichedContextPrefix;
 
         for (const [fileHandle, snippet] of documentInjectionSnippets) {
-            formattedFinalUserPrompt += `\n\n** ${fileHandle.name} full content **\n\n${snippet}\n\n** end of ${fileHandle.name} **\n\n`;
+            formattedFinalUserPrompt += `\n\n${translations.llmPrompts.fileContentStart(fileHandle.name)}\n\n${snippet}\n\n${translations.llmPrompts.fileContentEnd(fileHandle.name)}\n\n`;
         }
 
-        formattedFinalUserPrompt += `Based on the content above, please provide a response to the user query.\n\nUser query: ${input.getText()}`;
+        formattedFinalUserPrompt += translations.llmPrompts.enrichedContextSuffix(input.getText());
     }
 
     input.replaceText(formattedFinalUserPrompt);
@@ -225,13 +224,15 @@ async function chooseContextInjectionStrategy(
     originalUserPrompt: string,
     files: Array<FileHandle>,
 ): Promise<DocumentContextInjectionStrategy> {
+    const translations = t();
+
     // 1. 取得設定值
     const pluginConfig = ctl.getPluginConfig(dynamicConfig);
     const targetContextUsePercent = pluginConfig.get(CONFIG_KEYS.CONTEXT_THRESHOLD);
 
     const status = ctl.createStatus({
         status: "loading",
-        text: `Deciding how to handle the document(s)...`,
+        text: translations.status.decidingStrategy,
     });
 
     const model = await ctl.client.llm.model();
@@ -262,9 +263,9 @@ async function chooseContextInjectionStrategy(
 
         const loadingStatus = status.addSubStatus({
             status: "loading",
-            text: `Loading parser for ${file.name}...`,
+            text: translations.status.loadingParser(file.name),
         });
-        let actionProgressing = "Reading";
+        let actionProgressing = translations.verbs.reading;
         let parserIndicator = "";
 
         const {content} = await ctl.client.files.parseDocument(file, {
@@ -272,20 +273,23 @@ async function chooseContextInjectionStrategy(
             onParserLoaded: parser => {
                 loadingStatus.setState({
                     status: "loading",
-                    text: `${parser.library} loaded for ${file.name}...`,
+                    text: translations.status.parserLoaded(parser.library, file.name),
                 });
                 // Update action names if we're using a parsing framework
                 if (parser.library !== "builtIn") {
-                    actionProgressing = "Parsing";
+                    actionProgressing = translations.verbs.parsing;
                     parserIndicator = ` with ${parser.library}`;
                 }
             },
             onProgress: progress => {
                 loadingStatus.setState({
                     status: "loading",
-                    text: `${actionProgressing} file ${file.name}${parserIndicator}... (${(
-                        progress * 100
-                    ).toFixed(2)}%)`,
+                    text: translations.status.fileProcessing(
+                        actionProgressing,
+                        file.name,
+                        parserIndicator,
+                        `${(progress * 100).toFixed(2)}%`
+                    ),
                 });
             },
         });
@@ -325,7 +329,7 @@ async function chooseContextInjectionStrategy(
     ctl.debug(`\tAvailable Tokens: ${availableContextTokens}\n`);
 
     if (totalFilePlusPromptTokenCount > availableContextTokens) {
-        const chosenStrategy = "retrieval"; // 超過門檻，強制啟動 RAG
+        const chosenStrategy = "retrieval";
         ctl.debug(
             `Chosen context injection strategy: '${chosenStrategy}'. Total file + prompt token count: ` +
             `${totalFilePlusPromptTokenCount} > ${
@@ -334,8 +338,7 @@ async function chooseContextInjectionStrategy(
         );
         status.setState({
             status: "done",
-            // text: `Chosen context injection strategy: '${chosenStrategy}'. Retrieval is optimal for the size of content provided`,
-            text: `檔案預估佔用超過 ${Math.round(targetContextUsePercent * 100)}%，強制啟動 Embedding 檢索 (精確模式)`,
+            text: translations.status.strategyRetrieval(Math.round(targetContextUsePercent * 100)),
         });
         return chosenStrategy;
     }
@@ -350,8 +353,7 @@ async function chooseContextInjectionStrategy(
     const chosenStrategy = "inject-full-content";
     status.setState({
         status: "done",
-        // text: `Chosen context injection strategy: '${chosenStrategy}'. All content can fit into the context`,
-        text: `檔案大小在安全範圍內 (${Math.round(targetContextUsePercent * 100)}% 以下)，使用全文注入 (全面模式)`,
+        text: translations.status.strategyInjectFull(Math.round(targetContextUsePercent * 100)),
     });
     return chosenStrategy;
 }
