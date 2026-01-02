@@ -26,11 +26,10 @@ A flexible RAG (Retrieval-Augmented Generation) plugin for LM Studio with dynami
 
 ### Installation
 
-#### From LM Studio Plugin Marketplace (Recommended)
-1. Open LM Studio
-2. Navigate to **Plugins** → **Discover**
-3. Search for "RAG-Flex"
-4. Click **Install**
+#### From LM Studio Plugin Page (Recommended)
+1. Visit https://lmstudio.ai/yongwei/rag-flex
+2. Click **Run in LM Studio**
+3. LM Studio will automatically open and install the plugin
 
 #### From GitHub (Development Mode)
 ```bash

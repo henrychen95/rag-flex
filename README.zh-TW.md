@@ -26,11 +26,10 @@
 
 ### 安裝方式
 
-#### 從 LM Studio 插件市場安裝（推薦）
-1. 開啟 LM Studio
-2. 前往 **Plugins** → **Discover**
-3. 搜尋 "RAG-Flex"
-4. 點擊 **Install**
+#### 從 LM Studio 插件頁面安裝（推薦）
+1. 前往 https://lmstudio.ai/yongwei/rag-flex
+2. 點擊 **Run in LM Studio**
+3. LM Studio 會自動開啟並安裝插件
 
 #### 從 GitHub 安裝（開發模式）
 ```bash
