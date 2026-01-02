@@ -382,8 +382,6 @@ lms dev
 4. 更新 `src/config.ts` 語言選項
 5. 建立 `README.[lang].md`
 
-詳細指南請參閱 [CONTRIBUTING.md](CONTRIBUTING.md)。
-
 ## 📝 授權條款
 
 MIT License - 詳見 [LICENSE](LICENSE) 檔案

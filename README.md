@@ -382,8 +382,6 @@ To add a new language:
 4. Update `src/config.ts` language options
 5. Create `README.[lang].md`
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
-
 ## 📝 License
 
 MIT License - see [LICENSE](LICENSE) file for details.

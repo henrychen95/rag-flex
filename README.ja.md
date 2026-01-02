@@ -382,8 +382,6 @@ else:
 4. `src/config.ts` の言語オプションを更新
 5. `README.[lang].md` を作成
 
-詳細なガイドラインは [CONTRIBUTING.md](CONTRIBUTING.md) を参照してください。
-
 ## 📝 ライセンス
 
 MIT License - 詳細は [LICENSE](LICENSE) ファイルを参照
