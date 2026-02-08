@@ -14,6 +14,10 @@ export const en: Translations = {
             displayName: "Embedding Model",
             subtitle: "Select an embedding model (must be downloaded first)"
         },
+        customEmbeddingModel: {
+            displayName: "Custom Embedding Model",
+            subtitle: "Override selection above. Accepts: model key (e.g. text-embedding-bge-m3), identifier (e.g. lm-kit/bge-m3-gguf), or full path. Leave empty to use selection above."
+        },
         contextThreshold: {
             displayName: "Context Usage Threshold",
             subtitle: "Determines full-text injection vs. RAG retrieval | Default 0.7 | Lower = precise, Higher = comprehensive"
@@ -89,5 +93,9 @@ export const en: Translations = {
         embedding: "Embedding",
         reading: "Reading",
         parsing: "Parsing"
+    },
+
+    modelStatus: {
+        notDownloaded: "not downloaded"
     }
 };

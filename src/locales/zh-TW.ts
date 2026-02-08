@@ -15,6 +15,10 @@ export const zhTW: Translations = {
             displayName: "Embedding 模型",
             subtitle: "選擇 Embedding 模型 (必須先下載)"
         },
+        customEmbeddingModel: {
+            displayName: "自訂 Embedding 模型",
+            subtitle: "覆蓋上方選擇。支援：模型名稱（如 text-embedding-bge-m3）、識別碼（如 lm-kit/bge-m3-gguf）或完整路徑。留空則使用上方選擇。"
+        },
         contextThreshold: {
             displayName: "Context Usage Threshold (啟動門檻)",
             subtitle: "決定全文貼上或向量檢索 | 預設 0.7 | 數字越小越精確，越大越全面"
@@ -90,5 +94,9 @@ export const zhTW: Translations = {
         embedding: "向量化中",
         reading: "讀取中",
         parsing: "解析中"
+    },
+
+    modelStatus: {
+        notDownloaded: "未下載"
     }
 };

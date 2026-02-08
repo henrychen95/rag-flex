@@ -50,8 +50,11 @@ async function prepareRetrievalResultsContextInjection(
     const retrievalLimit = pluginConfig.get(CONFIG_KEYS.LIMIT);
     const retrievalAffinityThreshold = pluginConfig.get(CONFIG_KEYS.THRESHOLD);
 
-    // 讀取在 config.ts 定義的欄位
-    const modelPath = pluginConfig.get(CONFIG_KEYS.MODEL_PATH); // 取得下拉選單選中的路徑
+    // 讀取模型路徑：自訂路徑優先，否則使用下拉選單
+    const customModelPath = (pluginConfig.get(CONFIG_KEYS.CUSTOM_MODEL_PATH) as string || "").trim();
+    let modelPath = customModelPath || (pluginConfig.get(CONFIG_KEYS.MODEL_PATH) as string);
+    // 移除括號內的未下載標註，支援: (not downloaded), (未下載), (未ダウンロード)
+    modelPath = modelPath.replace(/ \([^)]+\)$/, ""); // 取得實際模型路徑
 
     // process files if necessary
     const statusSteps = new Map<FileHandle, PredictionProcessStatusController>();

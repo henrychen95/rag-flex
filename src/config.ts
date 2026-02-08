@@ -92,6 +92,15 @@ export const createDynamicConfig = (modelChoices: string[], systemLanguage: Supp
             safeChoices[0],
         )
         .field(
+            "customEmbeddingModelPath",
+            "string",
+            {
+                displayName: translations.config.customEmbeddingModel.displayName,
+                subtitle: translations.config.customEmbeddingModel.subtitle,
+            },
+            "",
+        )
+        .field(
             "contextUsageThreshold",
             "numeric",
             {
@@ -151,6 +160,7 @@ export const createDynamicConfig = (modelChoices: string[], systemLanguage: Supp
 export const CONFIG_KEYS = {
     LANGUAGE: "language",
     MODEL_PATH: "embeddingModelPath",
+    CUSTOM_MODEL_PATH: "customEmbeddingModelPath",
     CONTEXT_THRESHOLD: "contextUsageThreshold",
     LIMIT: "retrievalLimit",
     THRESHOLD: "retrievalAffinityThreshold",

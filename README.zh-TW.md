@@ -1,6 +1,6 @@
 # RAG-Flex
 
-[![版本](https://img.shields.io/badge/version-1.1.0-blue.svg)](https://github.com/henrychen95/rag-flex)
+[![版本](https://img.shields.io/badge/version-1.2.0-blue.svg)](https://github.com/henrychen95/rag-flex)
 [![授權](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![LM Studio](https://img.shields.io/badge/LM%20Studio-Plugin-orange.svg)](https://lmstudio.ai)
 
@@ -83,7 +83,8 @@ lms dev
 | 參數 | 預設值 | 範圍 | 說明 |
 |------|--------|------|------|
 | **訊息語言** | 自動偵測 | EN/ZH-TW/JA | 執行時訊息的語言 |
-| **Embedding 模型** | nomic-ai/nomic-embed-text-v1.5 | 4+ 種模型 | 選擇您的 Embedding 模型 |
+| **Embedding 模型** | nomic-ai/nomic-embed-text-v1.5 | 4 種預設 | 從預設的 Embedding 模型中選擇 |
+| **自訂 Embedding 模型** | （空白） | 文字輸入 | 覆蓋上方選擇，輸入模型名稱（如 `text-embedding-bge-m3`）、識別碼（如 `lm-kit/bge-m3-gguf`）或完整路徑 |
 | **情境使用門檻** | 0.7 | 0.1 - 1.0 | RAG 檢索觸發點（數值越低越精確） |
 | **檢索片段數** | 5 | 1 - 15 | 觸發檢索時回傳的片段數量 |
 | **相似度門檻** | 0.4 | 0.0 - 1.0 | 相似度門檻（BGE-M3 建議 0.4-0.6） |
@@ -99,7 +100,7 @@ lms dev
 | **groonga/gte-large-Q4_K_M-GGUF** | 216 MB | ⚡⚡ 中等 | 平衡型 | 多語言 |
 | **lm-kit/bge-m3-gguf** | 1.16 GB | ⚡ 慢 (F16) / ⚡⚡ 中等 (Q4) | 中文、多語言、高精度 | 100+ 種語言 |
 
-**自動偵測**：插件會自動偵測本地已下載的模型並加入下拉選單。
+**注意**：由於 SDK 限制，下拉選單僅顯示預設模型。請使用**自訂 Embedding 模型**欄位輸入模型名稱（如 `text-embedding-qwen3-embedding-8b`）、識別碼或完整路徑來指定任何已下載的模型。
 
 ## 💡 使用場景與範例
 
@@ -343,17 +344,17 @@ lms dev
 
 ## 🆚 相較於 RAG-v1 的改進
 
-| 功能 | RAG-v1 | RAG-Flex (v1.1) |
-|------|--------|----------|
-| **Embedding 模型** | ❌ 硬編碼（僅 nomic） | ✅ 4 種可選 + 自動偵測 |
+| 功能 | RAG-v1 | RAG-Flex (v1.2.0)    |
+|------|--------|----------------------|
+| **Embedding 模型** | ❌ 硬編碼（僅 nomic） | ✅ 4 種可選 + 自動偵測       |
 | **多語系支援** | ❌ 僅英文 | ✅ English, 繁體中文, 日本語 |
-| **錯誤訊息** | ❌ 技術性英文 | ✅ 友善的在地化訊息 |
-| **情境管理** | ⚙️ 基本門檻 | ✅ 智慧門檻策略 |
-| **相似度門檻** | ❌ 固定 0.5 | ✅ 可配置（0.0-1.0） |
-| **無結果處理** | ❌ 暴露系統提示詞 | ✅ 優雅降級 |
-| **模型偵測** | ❌ 手動設定 | ✅ 自動偵測本地模型 |
-| **除錯工具** | ❌ 無 | ✅ 可選的除錯日誌 |
-| **配置介面** | ⚙️ 僅英文 | ✅ 多語言（系統語言） |
+| **錯誤訊息** | ❌ 技術性英文 | ✅ 友善的在地化訊息           |
+| **情境管理** | ⚙️ 基本門檻 | ✅ 智慧門檻策略             |
+| **相似度門檻** | ❌ 固定 0.5 | ✅ 可配置（0.0-1.0）       |
+| **無結果處理** | ❌ 暴露系統提示詞 | ✅ 優雅降級               |
+| **模型偵測** | ❌ 手動設定 | ✅ 自動偵測本地模型           |
+| **除錯工具** | ❌ 無 | ✅ 可選的除錯日誌            |
+| **配置介面** | ⚙️ 僅英文 | ✅ 多語言（系統語言）          |
 
 ## 🤝 貢獻
 

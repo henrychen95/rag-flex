@@ -1,13 +1,28 @@
 import {type PluginContext} from "@lmstudio/sdk";
 import {createDynamicConfig, CONFIG_KEYS, DEFAULT_EMBEDDING_MODELS} from "./config";
 import {preprocess} from "./promptPreprocessor";
-import {initLanguage, detectSystemLanguage} from "./i18n";
+import {initLanguage, detectSystemLanguage, setLanguage, t} from "./i18n";
 import fs from 'fs';
 import path from 'path';
 
 // 導出此變數，讓 promptPreprocessor.ts 找得到它
 export let dynamicConfig: any;
 export let pluginContext: PluginContext | null = null;
+
+// 強制寫入 log（用於初始化階段診斷）
+const forceLog = (msg: string, data?: any) => {
+    try {
+        const logPath = './logs/lmstudio-debug.log';
+        const log = `[${new Date().toISOString()}] ${msg}${data ? ' ' + JSON.stringify(data, null, 2) : ''}\n`;
+        const logDir = path.dirname(logPath);
+        if (!fs.existsSync(logDir)) {
+            fs.mkdirSync(logDir, { recursive: true });
+        }
+        fs.appendFileSync(logPath, log);
+    } catch (error) {
+        // 靜默失敗
+    }
+};
 
 // Debug 函數 - 支援從配置讀取設定
 const debug = (msg: string, data?: any) => {
@@ -70,30 +85,17 @@ export async function main(context: PluginContext) {
     const detectedLanguage = detectSystemLanguage();
     debug("Detected system language:", detectedLanguage);
 
-    // 1. 從預設模型開始，準備合併偵測到的模型
+    // 設定語言以取得翻譯文字
+    setLanguage(detectedLanguage);
+    const translations = t();
+
+    // 1. 先準備預設模型（僅在偵測失敗時使用）
     let embeddingChoices: string[] = [...DEFAULT_EMBEDDING_MODELS];
 
-    try {
-        // 2. 嘗試偵測本地已下載的模型
-        const downloadedModels = await (context as any).client?.system?.listDownloadedModels();
-
-        if (downloadedModels) {
-            const detectedModels = downloadedModels
-                .filter((model: any) => {
-                    const type = (model.type || "").toLowerCase();
-                    return type.includes("embedding");
-                })
-                .map((model: { path: any; }) => model.path)
-                .filter(Boolean); // 確保沒有 undefined;
-
-            // 3. 合併並移除重複項，確保預設模型與偵測到的都會出現
-            embeddingChoices = Array.from(new Set([...DEFAULT_EMBEDDING_MODELS, ...detectedModels]));
-        } else {
-        }
-    } catch (error) {
-        debug("錯誤:", error);
-        debug("錯誤堆疊:", (error as Error).stack);
-    }
+    // SDK 限制：PluginContext 沒有 client 屬性，無法在初始化時偵測已下載模型
+    // 只能使用預設模型列表，使用者需在 LM Studio 先下載模型
+    forceLog("使用預設 embedding 模型列表（SDK 限制：無法在 main() 中存取 client）");
+    forceLog("預設模型:", DEFAULT_EMBEDDING_MODELS);
 
     // 4. 動態生成配置介面（帶語言參數）
     dynamicConfig = createDynamicConfig(embeddingChoices, detectedLanguage);

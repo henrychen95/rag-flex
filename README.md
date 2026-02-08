@@ -1,6 +1,6 @@
 # RAG-Flex
 
-[![Version](https://img.shields.io/badge/version-1.1.0-blue.svg)](https://github.com/henrychen95/rag-flex)
+[![Version](https://img.shields.io/badge/version-1.2.0-blue.svg)](https://github.com/henrychen95/rag-flex)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![LM Studio](https://img.shields.io/badge/LM%20Studio-Plugin-orange.svg)](https://lmstudio.ai)
 
@@ -83,7 +83,8 @@ Access plugin settings in LM Studio → Plugins → RAG-Flex
 | Parameter | Default | Range | Description |
 |-----------|---------|-------|-------------|
 | **Message Language** | Auto-detected | EN/ZH-TW/JA | Language for runtime messages |
-| **Embedding Model** | nomic-ai/nomic-embed-text-v1.5 | 4+ models | Choose your embedding model |
+| **Embedding Model** | nomic-ai/nomic-embed-text-v1.5 | 4 presets | Select from preset embedding models |
+| **Custom Embedding Model** | (empty) | Text input | Override selection above with model key (e.g. `text-embedding-bge-m3`), identifier (e.g. `lm-kit/bge-m3-gguf`), or full path |
 | **Context Usage Threshold** | 0.7 | 0.1 - 1.0 | Trigger point for RAG retrieval (lower = more precise) |
 | **Retrieval Limit** | 5 | 1 - 15 | Number of chunks to retrieve |
 | **Retrieval Affinity Threshold** | 0.4 | 0.0 - 1.0 | Similarity threshold (BGE-M3: 0.4-0.6 recommended) |
@@ -99,7 +100,7 @@ Access plugin settings in LM Studio → Plugins → RAG-Flex
 | **groonga/gte-large-Q4_K_M-GGUF** | 216 MB | ⚡⚡ Medium | Balanced performance | Multilingual |
 | **lm-kit/bge-m3-gguf** | 1.16 GB | ⚡ Slow (F16) / ⚡⚡ Medium (Q4) | Chinese, multilingual, high precision | 100+ languages |
 
-**Auto-Detection**: The plugin automatically detects locally downloaded models and adds them to the dropdown.
+**Note**: Due to SDK limitations, the dropdown only shows preset models. Use the **Custom Embedding Model** field to specify any downloaded model by entering its model key (e.g. `text-embedding-qwen3-embedding-8b`), identifier, or full path.
 
 ## 💡 Use Cases & Examples
 
@@ -343,16 +344,16 @@ Enable debug logging for troubleshooting or development:
 
 ## 🆚 Improvements Over RAG-v1
 
-| Feature | RAG-v1 | RAG-Flex (v1.1) |
-|---------|--------|----------|
-| **Embedding Models** | ❌ Hardcoded (nomic only) | ✅ 4 selectable + auto-detection |
-| **Multilingual Support** | ❌ English only | ✅ English, 繁體中文, 日本語 |
-| **Error Messages** | ❌ Technical English | ✅ User-friendly, localized |
+| Feature | RAG-v1 | RAG-Flex (v1.2.0)                |
+|---------|--------|----------------------------------|
+| **Embedding Models** | ❌ Hardcoded (nomic only) | ✅ 4 selectable + auto-detection  |
+| **Multilingual Support** | ❌ English only | ✅ English, 繁體中文, 日本語             |
+| **Error Messages** | ❌ Technical English | ✅ User-friendly, localized       |
 | **Context Management** | ⚙️ Basic threshold | ✅ Smart threshold-based strategy |
-| **Affinity Threshold** | ❌ Fixed at 0.5 | ✅ Configurable (0.0-1.0) |
-| **No-result Handling** | ❌ Exposes system prompt | ✅ Graceful degradation |
-| **Model Detection** | ❌ Manual configuration | ✅ Auto-detects local models |
-| **Debug Tools** | ❌ None | ✅ Optional debug logging |
+| **Affinity Threshold** | ❌ Fixed at 0.5 | ✅ Configurable (0.0-1.0)         |
+| **No-result Handling** | ❌ Exposes system prompt | ✅ Graceful degradation           |
+| **Model Detection** | ❌ Manual configuration | ✅ Auto-detects local models      |
+| **Debug Tools** | ❌ None | ✅ Optional debug logging         |
 | **Configuration UI** | ⚙️ English only | ✅ Multilingual (system language) |
 
 ## 🤝 Contributing

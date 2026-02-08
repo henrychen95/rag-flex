@@ -14,6 +14,10 @@ export const ja: Translations = {
             displayName: "埋め込みモデル",
             subtitle: "埋め込みモデルを選択（事前にダウンロードが必要）"
         },
+        customEmbeddingModel: {
+            displayName: "カスタム埋め込みモデル",
+            subtitle: "上記の選択を上書き。対応形式：モデルキー（例：text-embedding-bge-m3）、識別子（例：lm-kit/bge-m3-gguf）、または完全パス。空欄の場合は上記を使用。"
+        },
         contextThreshold: {
             displayName: "コンテキスト使用しきい値",
             subtitle: "全文挿入か RAG 検索かを決定 | デフォルト 0.7 | 低い = 精密、高い = 包括的"
@@ -89,5 +93,9 @@ export const ja: Translations = {
         embedding: "埋め込み",
         reading: "読み取り",
         parsing: "解析"
+    },
+
+    modelStatus: {
+        notDownloaded: "未ダウンロード"
     }
 };

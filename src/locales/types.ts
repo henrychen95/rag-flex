@@ -16,6 +16,10 @@ export interface Translations {
             displayName: string;
             subtitle: string;
         };
+        customEmbeddingModel: {
+            displayName: string;
+            subtitle: string;
+        };
         contextThreshold: {
             displayName: string;
             subtitle: string;
@@ -82,5 +86,10 @@ export interface Translations {
         embedding: string;
         reading: string;
         parsing: string;
+    };
+
+    // Model status labels
+    modelStatus: {
+        notDownloaded: string;
     };
 }
