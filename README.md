@@ -1,5 +1,7 @@
 # RAG-Flex
 
+[1,000+ installations via LM Studio Plugin Hub](https://lmstudio.ai/yongwei/rag-flex)
+
 [![Version](https://img.shields.io/badge/version-1.2.0-blue.svg)](https://github.com/henrychen95/rag-flex)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![LM Studio](https://img.shields.io/badge/LM%20Studio-Plugin-orange.svg)](https://lmstudio.ai)
